@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import languageEncoding from "detect-file-encoding-and-language";
 import Papa from 'papaparse';
 import ErrorMessage from "../Error/ErrorMessage";
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +18,7 @@ function MainPage() {
         }
     }, [navigate]);
 
-    const handleOnChange = (e) => {
+    const handleOnChange = async (e) => {
 
         let file = e.target.files[0];
 
@@ -25,9 +26,10 @@ function MainPage() {
             setError(true);
 
         } else {
+            const fileCode = await languageEncoding(file).then((fileInfo) => fileInfo.encoding);
             Papa.parse(file, {
                 header: true,
-                encoding: "UTF-8",
+                encoding: fileCode,
                 complete: (results) => {
                     setData(results.data);
                     localStorage.setItem('csvData', JSON.stringify(results.data));
